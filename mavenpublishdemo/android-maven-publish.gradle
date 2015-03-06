@@ -1,0 +1,74 @@
+apply plugin: 'maven-publish'
+
+
+def getRepositoryUrl(){
+    if(VERSION_NAME.contains("SNAPSHOT")){
+        return SNAPSHOT_REPOSITORY_URL
+    }
+    return RELEASE_REPOSITORY_URL
+}
+
+afterEvaluate {
+    android.libraryVariants.all { variant ->
+        println("=====${variant.name.capitalize()}")
+        def jarTask = project.tasks.create(name: "androidJavaJar${variant.name.capitalize()}", type: Jar) {
+            from variant.javaCompile.destinationDir
+            exclude "**/R.class"
+            exclude "**/BuildConfig.class"
+        }
+        jarTask.dependsOn variant.javaCompile
+    }
+
+//先不用这种方式代替上面，影响javadoc
+//   task demo(type:Jar,dependsOn: project.android.libraryVariants.toList().first().javaCompile){
+//        from project.android.libraryVariants.toList().first().javaCompile.destinationDir
+//    }
+
+    task androidJavadocs(type: Javadoc) {
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        classpath += project.android.libraryVariants.toList().first().javaCompile.classpath
+        println("classpath:${classpath.files}")
+    }
+
+    task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+        classifier 'javadoc'
+        from androidJavadocs.destinationDir
+    }
+
+    task androidSourcesJar(type: Jar) {
+        classifier = 'sources'
+        from android.sourceSets.main.java.sourceFiles
+    }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                pom {
+                    artifactId ARTIFACT_ID
+                    groupId GROUP_ID
+                    version VERSION_NAME
+                    packaging PACKAGEING
+                }
+                pom.withXml {
+                    println("${asString()}")
+                }
+                artifact bundleRelease
+                artifact androidJavaJarRelease
+                artifact androidJavadocsJar
+                artifact androidSourcesJar
+            }
+        }
+
+        repositories {
+            maven {
+                credentials {
+                    username = NEXUS_USERNAME
+                    password = NEXUS_PASSWORD
+                }
+                url getRepositoryUrl()
+            }
+        }
+    }
+}
+
