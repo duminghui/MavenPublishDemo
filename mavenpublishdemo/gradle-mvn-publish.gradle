@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 
 
 def getRepositoryUrl() {
-    if (VERSION_NAME.contains("SNAPSHOT")) {
+    if (POM_VERSION_NAME.contains("SNAPSHOT")) {
         return SNAPSHOT_REPOSITORY_URL
     }
     return RELEASE_REPOSITORY_URL
@@ -77,10 +77,10 @@ afterEvaluate {
         publications {
             maven(MavenPublication) {
                 pom {
-                    artifactId ARTIFACT_ID
-                    groupId GROUP_ID
-                    version VERSION_NAME
-                    packaging PACKAGEING
+                    artifactId POM_ARTIFACT_ID
+                    groupId POM_GROUP_ID
+                    version POM_VERSION_NAME
+                    packaging POM_PACKAGING
                 }
                 pom.withXml {
                     println("${asString()}")

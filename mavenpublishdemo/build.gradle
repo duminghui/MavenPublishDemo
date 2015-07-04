@@ -24,7 +24,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
 }
 
-apply from: "android-maven-publish.gradle"
+apply from: 'gradle-mvn-publish.gradle'
 
 
 
