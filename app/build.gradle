@@ -22,9 +22,9 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
-    compile ('groupID:artifactId:0.0.1-SNAPSHOT'){
-        changing true
-    }
+//    compile ('groupID:artifactId:0.0.1-SNAPSHOT'){
+//        changing true
+//    }
 }
 
 repositories {
